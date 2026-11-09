@@ -10,7 +10,7 @@ A especificação completa está em [`prd.md`](prd.md).
 ## Stack
 
 React 18 + Vite + TypeScript, Tailwind CSS, Zod, Supabase (banco e analytics), Vitest + Testing
-Library. Deploy na Vercel.
+Library. Por enquanto o app roda só localmente (sem hospedagem publicada).
 
 O jogo funciona **sem o Supabase**: as perguntas vêm de [`data/questions.json`](data/questions.json),
 empacotado no build. Quando o Supabase está configurado, as perguntas vêm dele (com o JSON como
@@ -46,12 +46,12 @@ Sem um arquivo `.env`, o app usa o JSON local e não envia analytics. Para usar 
 
 | Variável                    | Onde usar                                    | Para quê                                            |
 | --------------------------- | -------------------------------------------- | --------------------------------------------------- |
-| `VITE_SUPABASE_URL`         | `.env` local e Vercel                        | URL do projeto Supabase                             |
-| `VITE_SUPABASE_ANON_KEY`    | `.env` local e Vercel                        | Chave pública (anon). Protegida pelas regras de RLS |
+| `VITE_SUPABASE_URL`         | `.env` local                                 | URL do projeto Supabase                             |
+| `VITE_SUPABASE_ANON_KEY`    | `.env` local                                 | Chave pública (anon). Protegida pelas regras de RLS |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Só** no `.env` local ou no CI, para o seed | Chave de administrador: ignora o RLS                |
 
-> **Nunca** coloque a `SUPABASE_SERVICE_ROLE_KEY` na Vercel, não a prefixe com `VITE_` e não a
-> importe em `src/`. Tudo que começa com `VITE_` vai para o JavaScript público do site.
+> **Nunca** prefixe a `SUPABASE_SERVICE_ROLE_KEY` com `VITE_` nem a importe em `src/`. Tudo que
+> começa com `VITE_` vai para o JavaScript público do site.
 
 ## Configurar o Supabase
 
@@ -69,25 +69,6 @@ Para ver a taxa de erro por pergunta, rode no SQL Editor (como administrador):
 select * from public.question_stats order by error_rate desc nulls last;
 ```
 
-## Deploy na Vercel
-
-A configuração está em [`vercel.json`](vercel.json): build com `npm run build`, saída em `dist`,
-cache longo para os arquivos com hash em `/assets` e cabeçalhos de segurança (CSP, `nosniff`,
-`X-Frame-Options` e outros).
-
-1. Na Vercel, **Add New > Project** e importe este repositório do GitHub. O framework (Vite) é
-   detectado automaticamente.
-2. Em **Settings > Environment Variables**, cadastre apenas `VITE_SUPABASE_URL` e
-   `VITE_SUPABASE_ANON_KEY` (Production e Preview).
-3. Faça o deploy. A partir daí, cada push na `main` publica em produção e cada pull request ganha
-   um link de preview.
-
-As variáveis `VITE_*` entram no build. Se mudar alguma delas, faça um novo deploy (**Redeploy**)
-para ela valer.
-
-A CSP só permite conexões com o próprio site e com `https://*.supabase.co`. Se o Supabase ficar
-atrás de um domínio próprio, inclua esse domínio em `connect-src` no `vercel.json`.
-
 ## Atualizar as perguntas
 
 1. Edite [`data/questions.json`](data/questions.json). Regras (verificadas pelos testes):
@@ -102,7 +83,7 @@ atrás de um domínio próprio, inclua esse domínio em `connect-src` no `vercel
 4. Rode `npm run seed`. Ele atualiza as perguntas pelo `id`. Perguntas removidas do JSON viram
    `active = false` no banco e nunca são apagadas, para preservar o histórico de respostas.
 
-O site publicado também usa o JSON como reserva, então faça o deploy depois de mudar o arquivo.
+O app também usa o JSON como reserva quando o Supabase não responde.
 
 ## Estrutura
 
