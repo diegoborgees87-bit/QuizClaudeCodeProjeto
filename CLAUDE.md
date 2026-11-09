@@ -6,7 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `prd.md` is the approved product spec and the source of truth. Follow the implementation order in `prd.md` §10.
 
-Done: step 1 (scaffold). The app is still a placeholder (`src/App.tsx`), and `npm run seed` is a stub that exits with an error until step 7.
+Done: step 1 (scaffold) and step 2 (Zod schema in `src/schemas/question.ts` with `parseQuestions`, `data/questions.json` with the 12 sample questions, bank tests in `tests/questionBank.test.ts`). Steps 6 and 7 were done ahead of 3–5: `supabase/migrations/0001_init.sql`, `src/services/{supabase,questionsRepo,analytics}.ts` and `scripts/seed-questions.ts` (`npm run seed`, run by Node's native TS support with `--env-file-if-exists=.env`). Step 3 is done: `src/game/{draw,scoring,reducer}.ts` with tests in `tests/game/` (shared fixtures and a seeded PRNG in `tests/game/fixtures.ts`). `drawQuestions` degrades on a small bank: it returns fewer than 10 questions, or an unbalanced split, instead of throwing. The reducer is pure: drawing, the timer and analytics run outside it, and an action that doesn't apply returns the same state object. Next is step 4 (`useTimer`). The services are not wired into the UI yet. The app is still a placeholder (`src/App.tsx`).
+
+Deviation from PRD §5.4, on purpose: anon has no UPDATE on `game_sessions`. Sessions are finished through the `finish_game_session` RPC (SECURITY DEFINER), because a plain `UPDATE ... WHERE id` would require SELECT on the table. The client generates the session UUID, so inserts don't need RETURNING. A tab switch marks the session `abandoned`, and a later `completed` overrides it.
+
+The bank size and balance tests (≥30 per level, 45–55% true) are skipped behind `BANK_COMPLETE = false` in `tests/questionBank.test.ts` until step 8. Set it to `true` when the bank is complete. A guard test fails if the bank reaches 90 questions while the flag is still `false`.
 
 Tooling notes:
 - Node is installed at `C:\Program Files\nodejs` but may not be on PATH in the shell. If so, prepend it: `$env:Path = "C:\Program Files\nodejs;$env:Path"`.
@@ -55,6 +59,10 @@ npm run seed         # upsert data/questions.json into Supabase (needs SUPABASE_
 - IDs follow `beg-NNN` / `int-NNN` / `adv-NNN` and are unique. There are at least 30 active questions per level, 90 or more in total.
 - The share of true answers is 45–55% per level. `statement` is at most 200 chars and `explanation` at most 400. `docUrl` is optional but must be a valid https URL when present.
 - Content must be factually checked against the official Claude Code docs (`code.claude.com/docs`, `docs.claude.com`). If a fact is uncertain, drop the question. Avoid double negatives and trick wording, and explain technical terms in plain business language.
+
+## Frontend patterns
+
+For anything in `src/components`, `src/screens`, `src/hooks` or `App.tsx`, follow the project skill `.claude/skills/frontend-patterns/SKILL.md`. It is adapted from the ECC skill and lists which upstream patterns (Next.js, Zustand, React Query, Framer Motion, etc.) do not apply here.
 
 ## Quality bar
 
