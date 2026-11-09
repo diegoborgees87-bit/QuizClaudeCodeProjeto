@@ -5,7 +5,7 @@
     "statement": "O Claude Code é um assistente de IA que pode ler arquivos, editar código e executar comandos em um projeto.",
     "answer": true,
     "explanation": "Ele atua como um agente: entende o projeto, faz alterações e roda comandos, sempre dentro das permissões dadas.",
-    "docUrl": "https://code.claude.com/docs/en/overview",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
     "topic": "fundamentos",
     "active": true
   },
@@ -15,17 +15,17 @@
     "statement": "O Claude Code só funciona em projetos escritos em Python.",
     "answer": false,
     "explanation": "Ele trabalha com praticamente qualquer linguagem e tipo de arquivo de texto.",
-    "docUrl": "https://code.claude.com/docs/en/overview",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
     "topic": "fundamentos",
     "active": true
   },
   {
     "id": "beg-003",
     "level": "beginner",
-    "statement": "Por padrão, o Claude Code pede permissão antes de ações como editar arquivos ou executar comandos.",
+    "statement": "O Claude Code tem modos de permissão que definem o que ele pode fazer sem pedir sua aprovação antes.",
     "answer": true,
-    "explanation": "O usuário aprova as ações; é possível ajustar esse comportamento com modos de permissão.",
-    "docUrl": "https://code.claude.com/docs/en/permissions",
+    "explanation": "No modo Manual, ele pergunta antes de editar arquivos ou rodar comandos. No modo automático, padrão nas versões recentes do terminal e do VS Code, um classificador revisa as ações arriscadas antes de elas rodarem.",
+    "docUrl": "https://code.claude.com/docs/pt/permission-modes",
     "topic": "permissoes",
     "active": true
   },
@@ -35,8 +35,268 @@
     "statement": "O Claude Code só pode ser usado dentro de uma IDE como o VS Code.",
     "answer": false,
     "explanation": "Ele roda no terminal (CLI), no app desktop, na web e também tem extensões para IDEs.",
-    "docUrl": "https://code.claude.com/docs/en/overview",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
     "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "beg-005",
+    "level": "beginner",
+    "statement": "Além do terminal, o Claude Code pode ser usado em um app desktop, no navegador e em extensões para VS Code e JetBrains.",
+    "answer": true,
+    "explanation": "Todas essas \"superfícies\" usam o mesmo motor do Claude Code, então as instruções e configurações do projeto valem em qualquer uma delas.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "beg-006",
+    "level": "beginner",
+    "statement": "O Claude Code consegue criar commits e abrir pull requests trabalhando diretamente com o git.",
+    "answer": true,
+    "explanation": "O git é a ferramenta que guarda o histórico do código. O Claude Code prepara as mudanças, escreve a mensagem do commit, cria branches e abre pull requests (pedidos de revisão).",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "git",
+    "active": true
+  },
+  {
+    "id": "beg-007",
+    "level": "beginner",
+    "statement": "É possível usar o Claude Code pelo navegador, sem instalar nada no computador.",
+    "answer": true,
+    "explanation": "Em claude.ai/code, as sessões rodam em máquinas na nuvem gerenciadas pela Anthropic. Isso exige conectar o GitHub e um plano compatível.",
+    "docUrl": "https://code.claude.com/docs/pt/claude-code-on-the-web",
+    "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "beg-008",
+    "level": "beginner",
+    "statement": "A maioria das formas de usar o Claude Code exige uma assinatura do Claude ou uma conta no Anthropic Console.",
+    "answer": true,
+    "explanation": "O terminal e as extensões de IDE também aceitam provedores de nuvem terceiros, como Amazon Bedrock e Google Cloud, muito usados por empresas.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "planos",
+    "active": true
+  },
+  {
+    "id": "beg-009",
+    "level": "beginner",
+    "statement": "Você pode interromper o Claude Code a qualquer momento para corrigir o rumo do trabalho.",
+    "answer": true,
+    "explanation": "Apertar Esc para o trabalho na hora. Também dá para digitar uma correção enquanto ele trabalha, e ele a lê assim que possível, sem precisar recomeçar.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-010",
+    "level": "beginner",
+    "statement": "O Claude Code pode rodar os testes do projeto para conferir se a própria alteração funcionou.",
+    "answer": true,
+    "explanation": "Ele trabalha em ciclo: reúne contexto, age e verifica o resultado. Rodar testes é uma forma comum de verificação antes de dar a tarefa por concluída.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-011",
+    "level": "beginner",
+    "statement": "Edições de arquivo feitas pelo Claude Code podem ser desfeitas, voltando a um ponto anterior da conversa.",
+    "answer": true,
+    "explanation": "Antes de cada pedido, o Claude Code guarda um \"checkpoint\" dos arquivos. Com /rewind, ou apertando Esc duas vezes, você volta a um estado anterior.",
+    "docUrl": "https://code.claude.com/docs/pt/checkpointing",
+    "topic": "checkpoints",
+    "active": true
+  },
+  {
+    "id": "beg-012",
+    "level": "beginner",
+    "statement": "Cada nova sessão do Claude Code começa sem o histórico das conversas anteriores.",
+    "answer": true,
+    "explanation": "As sessões são independentes. O que precisa valer sempre fica no CLAUDE.md, e o Claude também pode guardar aprendizados na memória automática.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "sessoes",
+    "active": true
+  },
+  {
+    "id": "beg-013",
+    "level": "beginner",
+    "statement": "Você pode fazer pedidos em linguagem natural, sem dizer quais arquivos ler ou quais comandos rodar.",
+    "answer": true,
+    "explanation": "A documentação recomenda delegar como faria com um colega: dê o contexto e o objetivo, e o Claude descobre os detalhes sozinho.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-014",
+    "level": "beginner",
+    "statement": "O Claude Code também ajuda em tarefas fora da programação, como escrever documentação ou pesquisar um tema.",
+    "answer": true,
+    "explanation": "Embora seja focado em código, ele ajuda com quase tudo que se faz pela linha de comando: documentação, buscas em arquivos, pesquisas e mais.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-015",
+    "level": "beginner",
+    "statement": "O usuário continua responsável por revisar o código e os comandos propostos pelo Claude Code.",
+    "answer": true,
+    "explanation": "A documentação de segurança é clara: revisar as alterações e os comandos antes de aprovar é responsabilidade de quem usa. A IA ajuda, mas não substitui a revisão humana.",
+    "docUrl": "https://code.claude.com/docs/pt/security",
+    "topic": "seguranca",
+    "active": true
+  },
+  {
+    "id": "beg-016",
+    "level": "beginner",
+    "statement": "Uma sessão do Claude Code na nuvem continua rodando mesmo depois que você fecha o notebook.",
+    "answer": true,
+    "explanation": "Sessões na nuvem rodam em máquinas da Anthropic, e não no seu computador. Dá para acompanhar o andamento de outro dispositivo, inclusive do celular.",
+    "docUrl": "https://code.claude.com/docs/pt/claude-code-on-the-web",
+    "topic": "nuvem",
+    "active": true
+  },
+  {
+    "id": "beg-017",
+    "level": "beginner",
+    "statement": "No Slack, é possível mencionar o Claude com um relato de bug e receber de volta um pull request.",
+    "answer": true,
+    "explanation": "A integração com o Slack leva pedidos da conversa do time direto para o Claude Code, que pode devolver a correção pronta para revisão.",
+    "docUrl": "https://code.claude.com/docs/pt/slack",
+    "topic": "integracoes",
+    "active": true
+  },
+  {
+    "id": "beg-018",
+    "level": "beginner",
+    "statement": "O Claude Code só consegue trabalhar com um arquivo por vez, como um corretor de texto.",
+    "answer": false,
+    "explanation": "Ele enxerga o projeto inteiro: busca os arquivos relevantes, lê vários e faz alterações coordenadas entre eles. Assistentes mais simples só veem o arquivo aberto.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-019",
+    "level": "beginner",
+    "statement": "O Claude Code só funciona no sistema operacional macOS.",
+    "answer": false,
+    "explanation": "Ele também roda no Windows e no Linux. O app desktop tem versões para macOS e Windows, e uma versão beta para Linux.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "beg-020",
+    "level": "beginner",
+    "statement": "O Claude Code só entende pedidos escritos com comandos técnicos.",
+    "answer": false,
+    "explanation": "Você descreve o que quer em linguagem comum. O Claude Code planeja a abordagem, escreve o código e verifica se funciona.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-021",
+    "level": "beginner",
+    "statement": "Para usar o app desktop, é preciso instalar também a versão de terminal do Claude Code.",
+    "answer": false,
+    "explanation": "O app desktop já inclui o Claude Code, então não é necessário instalar a versão de terminal separadamente. O app exige uma assinatura paga.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "beg-022",
+    "level": "beginner",
+    "statement": "O Claude Code consegue desfazer qualquer ação, inclusive mudanças em bancos de dados e publicações de sistemas.",
+    "answer": false,
+    "explanation": "Os checkpoints só cobrem arquivos. Ações em sistemas externos, como bancos de dados, APIs e deploys (publicação de sistemas), não podem ser desfeitas por eles. Por isso as permissões importam.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "checkpoints",
+    "active": true
+  },
+  {
+    "id": "beg-023",
+    "level": "beginner",
+    "statement": "Os checkpoints do Claude Code substituem o git para guardar o histórico do projeto.",
+    "answer": false,
+    "explanation": "Os checkpoints servem para desfazer algo rápido dentro da sessão. Para histórico permanente e trabalho em equipe, a recomendação é continuar usando o git.",
+    "docUrl": "https://code.claude.com/docs/pt/checkpointing",
+    "topic": "checkpoints",
+    "active": true
+  },
+  {
+    "id": "beg-024",
+    "level": "beginner",
+    "statement": "O Claude Code só funciona com projetos hospedados no GitHub.",
+    "answer": false,
+    "explanation": "No computador, você pode iniciá-lo em qualquer pasta de projeto. O GitHub é necessário principalmente para as sessões na nuvem e para integrações como o GitHub Actions.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-025",
+    "level": "beginner",
+    "statement": "Para o Claude Code ajudar, é preciso escrever o pedido perfeito logo na primeira tentativa.",
+    "answer": false,
+    "explanation": "O uso é uma conversa: comece com o que você quer e vá refinando. Se a primeira tentativa não ficar boa, você corrige o rumo sem começar do zero.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-026",
+    "level": "beginner",
+    "statement": "O Claude Code funciona apenas como um chat de perguntas e respostas sobre código.",
+    "answer": false,
+    "explanation": "Ele usa ferramentas para agir: lê e edita arquivos, roda comandos e testes, pesquisa na web e usa o git. É isso que o torna um \"agente\".",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-027",
+    "level": "beginner",
+    "statement": "Só é possível acompanhar uma sessão do Claude Code pelo computador.",
+    "answer": false,
+    "explanation": "Dá para acompanhar e conduzir sessões pelo app Claude no celular, tanto as que rodam na nuvem quanto as do seu computador, via Remote Control.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "beg-028",
+    "level": "beginner",
+    "statement": "Para usar o Claude Code com o VS Code, é preciso sair do editor e trabalhar só no terminal.",
+    "answer": false,
+    "explanation": "A extensão para VS Code mostra as alterações e o histórico da conversa dentro do próprio editor, sem precisar sair dele.",
+    "docUrl": "https://code.claude.com/docs/pt/vs-code",
+    "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "beg-029",
+    "level": "beginner",
+    "statement": "O Claude Code só serve para escrever código do zero.",
+    "answer": false,
+    "explanation": "Ele também corrige bugs a partir de uma mensagem de erro, escreve testes, resolve conflitos de código, atualiza dependências e escreve notas de versão.",
+    "docUrl": "https://code.claude.com/docs/pt/overview",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-030",
+    "level": "beginner",
+    "statement": "Nos planos Team e Enterprise, a Anthropic usa por padrão o código enviado ao Claude Code para treinar seus modelos.",
+    "answer": false,
+    "explanation": "Nos termos comerciais (Team, Enterprise e API), a Anthropic não treina modelos com o código ou os pedidos enviados, a menos que o cliente escolha participar de um programa específico.",
+    "docUrl": "https://code.claude.com/docs/pt/data-usage",
+    "topic": "privacidade",
     "active": true
   },
   {
@@ -44,8 +304,8 @@
     "level": "intermediate",
     "statement": "O arquivo CLAUDE.md serve para dar ao Claude Code instruções e contexto persistentes sobre o projeto.",
     "answer": true,
-    "explanation": "Ele é carregado automaticamente e funciona como um \"manual do projeto\" para o Claude.",
-    "docUrl": "https://code.claude.com/docs/en/memory",
+    "explanation": "Ele é carregado automaticamente no início de cada sessão e funciona como um \"manual do projeto\" para o Claude.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
     "topic": "contexto",
     "active": true
   },
@@ -54,8 +314,8 @@
     "level": "intermediate",
     "statement": "O plan mode permite que o Claude analise o problema e proponha um plano antes de alterar arquivos.",
     "answer": true,
-    "explanation": "É útil para revisar a estratégia antes de qualquer mudança acontecer.",
-    "docUrl": "https://code.claude.com/docs/en/common-workflows",
+    "explanation": "No plan mode, o Claude lê arquivos e explora o projeto, mas só edita depois que você aprova o plano. É útil para revisar a estratégia antes de qualquer mudança.",
+    "docUrl": "https://code.claude.com/docs/pt/permission-modes",
     "topic": "plan-mode",
     "active": true
   },
@@ -64,9 +324,279 @@
     "level": "intermediate",
     "statement": "O comando /clear apaga os arquivos do projeto.",
     "answer": false,
-    "explanation": "Ele limpa o histórico da conversa, não os arquivos.",
-    "docUrl": "https://code.claude.com/docs/en/commands",
+    "explanation": "Ele começa uma conversa nova, com o contexto vazio. Os arquivos do projeto não são tocados.",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
     "topic": "comandos",
+    "active": true
+  },
+  {
+    "id": "int-004",
+    "level": "intermediate",
+    "statement": "O comando /init cria um CLAUDE.md inicial analisando o projeto.",
+    "answer": true,
+    "explanation": "O Claude examina o código e gera o arquivo com comandos de build, instruções de teste e convenções que encontrar. Depois você completa com o que ele não tem como descobrir.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-005",
+    "level": "intermediate",
+    "statement": "O comando /compact resume a conversa para liberar espaço no contexto, sem começar do zero.",
+    "answer": true,
+    "explanation": "A conversa continua, mas o histórico é condensado em um resumo. Você pode até indicar o foco, como \"/compact foque nas mudanças da API\".",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-006",
+    "level": "intermediate",
+    "statement": "No terminal, a tecla Shift+Tab alterna entre os modos de permissão, incluindo o plan mode.",
+    "answer": true,
+    "explanation": "O ciclo passa por Manual, Accept edits e Plan, além dos modos opcionais que estiverem habilitados. Também dá para entrar no plan mode com o comando /plan.",
+    "docUrl": "https://code.claude.com/docs/pt/permission-modes",
+    "topic": "permissoes",
+    "active": true
+  },
+  {
+    "id": "int-007",
+    "level": "intermediate",
+    "statement": "O comando /rewind, ou apertar Esc duas vezes com o campo de texto vazio, abre o menu para voltar a um ponto anterior.",
+    "answer": true,
+    "explanation": "No menu, você escolhe restaurar o código, a conversa ou ambos, ou resumir parte da conversa para liberar espaço.",
+    "docUrl": "https://code.claude.com/docs/pt/checkpointing",
+    "topic": "checkpoints",
+    "active": true
+  },
+  {
+    "id": "int-008",
+    "level": "intermediate",
+    "statement": "O comando /context mostra o que está ocupando espaço na janela de contexto da conversa.",
+    "answer": true,
+    "explanation": "A \"janela de contexto\" é a memória de trabalho da sessão. O /context a mostra como uma grade colorida e sugere como liberar espaço.",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-009",
+    "level": "intermediate",
+    "statement": "Quando a conversa fica longa demais, o Claude Code resume o histórico automaticamente para poder continuar.",
+    "answer": true,
+    "explanation": "Essa compactação automática preserva os pedidos e os trechos de código principais, mas detalhes do início podem se perder. Regras permanentes devem ficar no CLAUDE.md.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-010",
+    "level": "intermediate",
+    "statement": "No modo Accept edits, o Claude edita arquivos sem pedir aprovação, mas ainda pergunta antes de outros comandos.",
+    "answer": true,
+    "explanation": "Além das edições, ele roda sem perguntar comandos simples de arquivos, como criar pastas ou mover arquivos. Os demais comandos de terminal continuam pedindo aprovação.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "permissoes",
+    "active": true
+  },
+  {
+    "id": "int-011",
+    "level": "intermediate",
+    "statement": "O comando /usage mostra o custo da sessão e o uso dos limites do plano.",
+    "answer": true,
+    "explanation": "Para quem paga por uso da API, mostra o custo estimado da sessão. Para assinantes, mostra as barras de uso do plano e o que mais consome esses limites.",
+    "docUrl": "https://code.claude.com/docs/pt/costs",
+    "topic": "custos",
+    "active": true
+  },
+  {
+    "id": "int-012",
+    "level": "intermediate",
+    "statement": "Usar /clear ao mudar para uma tarefa sem relação com a anterior ajuda a economizar tokens.",
+    "answer": true,
+    "explanation": "Tokens são a unidade de cobrança da IA. O contexto antigo é reenviado a cada mensagem, então limpar entre tarefas diferentes evita gastar com algo que não importa mais.",
+    "docUrl": "https://code.claude.com/docs/pt/costs",
+    "topic": "custos",
+    "active": true
+  },
+  {
+    "id": "int-013",
+    "level": "intermediate",
+    "statement": "Um arquivo CLAUDE.local.md guarda preferências pessoais do projeto que não devem ir para o git.",
+    "answer": true,
+    "explanation": "Ele é carregado junto com o CLAUDE.md, mas é só seu: deve ser adicionado ao .gitignore para não ser compartilhado com o time.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-014",
+    "level": "intermediate",
+    "statement": "É possível retomar uma conversa anterior com o comando /resume.",
+    "answer": true,
+    "explanation": "O /resume abre uma conversa pelo nome ou ID, ou mostra uma lista de sessões para escolher. As conversas ficam salvas no seu computador.",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
+    "topic": "sessoes",
+    "active": true
+  },
+  {
+    "id": "int-015",
+    "level": "intermediate",
+    "statement": "O comando /security-review analisa as mudanças da branch atual em busca de vulnerabilidades.",
+    "answer": true,
+    "explanation": "Ele compara sua branch com a principal e aponta riscos como injeção de código, falhas de autenticação e exposição de dados.",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
+    "topic": "revisao",
+    "active": true
+  },
+  {
+    "id": "int-016",
+    "level": "intermediate",
+    "statement": "O comando /model permite trocar o modelo de IA usado pelo Claude Code.",
+    "answer": true,
+    "explanation": "Há modelos com equilíbrios diferentes entre custo e capacidade. A escolha é salva como padrão para as próximas sessões, a menos que você troque só para a sessão atual.",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
+    "topic": "comandos",
+    "active": true
+  },
+  {
+    "id": "int-017",
+    "level": "intermediate",
+    "statement": "As instruções do CLAUDE.md são regras que o Claude Code é tecnicamente obrigado a cumprir.",
+    "answer": false,
+    "explanation": "O CLAUDE.md é tratado como contexto, não como configuração imposta. Para bloquear uma ação de verdade, use regras de permissão ou um hook.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-018",
+    "level": "intermediate",
+    "statement": "No plan mode, o Claude já começa a editar os arquivos enquanto monta o plano.",
+    "answer": false,
+    "explanation": "No plan mode, as edições ficam bloqueadas até você aprovar o plano. Ele só lê arquivos e roda comandos de exploração.",
+    "docUrl": "https://code.claude.com/docs/pt/permission-modes",
+    "topic": "plan-mode",
+    "active": true
+  },
+  {
+    "id": "int-019",
+    "level": "intermediate",
+    "statement": "O comando /compact apaga toda a conversa e começa uma sessão vazia.",
+    "answer": false,
+    "explanation": "Quem começa uma conversa vazia é o /clear. O /compact mantém a sessão e condensa o histórico em um resumo para liberar espaço.",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-020",
+    "level": "intermediate",
+    "statement": "Ao trocar de branch (uma versão paralela do código), o Claude Code esquece o que foi conversado na sessão.",
+    "answer": false,
+    "explanation": "Ao trocar de branch, o Claude passa a ver os arquivos da nova branch, mas o histórico da conversa continua o mesmo.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "git",
+    "active": true
+  },
+  {
+    "id": "int-021",
+    "level": "intermediate",
+    "statement": "O CLAUDE.md só pode existir em um lugar: na raiz do projeto.",
+    "answer": false,
+    "explanation": "Há vários níveis: um arquivo da empresa, um pessoal em ~/.claude/CLAUDE.md, o do projeto e o local. Pastas internas também podem ter o seu, carregado quando o Claude trabalha nelas.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-022",
+    "level": "intermediate",
+    "statement": "A lista de comandos disponíveis só pode ser consultada na documentação online.",
+    "answer": false,
+    "explanation": "Basta digitar \"/\" no Claude Code para ver e filtrar os comandos disponíveis. O comando /help também mostra a ajuda.",
+    "docUrl": "https://code.claude.com/docs/pt/commands",
+    "topic": "comandos",
+    "active": true
+  },
+  {
+    "id": "int-023",
+    "level": "intermediate",
+    "statement": "O /rewind também desfaz arquivos alterados só por comandos de terminal, como apagar um arquivo com rm.",
+    "answer": false,
+    "explanation": "Os checkpoints acompanham as edições feitas pelas ferramentas de edição do Claude. Um arquivo alterado apenas por comandos de terminal não é rastreado. Para isso, use o git.",
+    "docUrl": "https://code.claude.com/docs/pt/checkpointing",
+    "topic": "checkpoints",
+    "active": true
+  },
+  {
+    "id": "int-024",
+    "level": "intermediate",
+    "statement": "Ao aprovar um comando de terminal com a opção \"não perguntar de novo\", a aprovação vale só para aquela resposta.",
+    "answer": false,
+    "explanation": "Para comandos de terminal, essa opção fica salva de forma permanente para aquele projeto e aquele comando, como uma regra de permissão.",
+    "docUrl": "https://code.claude.com/docs/pt/permissions",
+    "topic": "permissoes",
+    "active": true
+  },
+  {
+    "id": "int-025",
+    "level": "intermediate",
+    "statement": "Enquanto o Claude trabalha, é preciso esperar ele terminar para mandar outra mensagem.",
+    "answer": false,
+    "explanation": "Você pode digitar uma correção e apertar Enter enquanto ele trabalha. A mensagem fica na fila e o Claude a lê assim que terminar a ação em andamento.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "sessoes",
+    "active": true
+  },
+  {
+    "id": "int-026",
+    "level": "intermediate",
+    "statement": "Um CLAUDE.md bem longo, com milhares de linhas, faz o Claude seguir as instruções com mais precisão.",
+    "answer": false,
+    "explanation": "A recomendação é ficar abaixo de 200 linhas por arquivo. Arquivos longos ocupam mais contexto e reduzem a aderência às instruções.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-027",
+    "level": "intermediate",
+    "statement": "O plan mode só pode ser ativado no momento em que o Claude Code é iniciado.",
+    "answer": false,
+    "explanation": "Dá para entrar no plan mode a qualquer momento: com Shift+Tab ou com /plan antes do pedido. Também é possível iniciar já nele.",
+    "docUrl": "https://code.claude.com/docs/pt/permission-modes",
+    "topic": "plan-mode",
+    "active": true
+  },
+  {
+    "id": "int-028",
+    "level": "intermediate",
+    "statement": "O Claude Code guarda o histórico das conversas apenas na nuvem da Anthropic.",
+    "answer": false,
+    "explanation": "As conversas são salvas localmente, em arquivos dentro de ~/.claude/projects/ no seu computador. É isso que permite retomar e voltar a pontos anteriores.",
+    "docUrl": "https://code.claude.com/docs/pt/how-claude-code-works",
+    "topic": "sessoes",
+    "active": true
+  },
+  {
+    "id": "int-029",
+    "level": "intermediate",
+    "statement": "O comando /init sobrescreve sem aviso um CLAUDE.md que já existe no projeto.",
+    "answer": false,
+    "explanation": "Se já existe um CLAUDE.md, o /init sugere melhorias em vez de sobrescrever o arquivo.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-030",
+    "level": "intermediate",
+    "statement": "Pedidos vagos, como \"melhore este código\", costumam gastar menos tokens que pedidos específicos.",
+    "answer": false,
+    "explanation": "É o contrário: pedidos vagos fazem o Claude vasculhar o projeto inteiro. Algo como \"valide os dados da função de login em auth.ts\" leva a menos leituras e menos custo.",
+    "docUrl": "https://code.claude.com/docs/pt/costs",
+    "topic": "custos",
     "active": true
   },
   {
@@ -74,8 +604,8 @@
     "level": "advanced",
     "statement": "O MCP (Model Context Protocol) permite conectar o Claude Code a ferramentas e fontes de dados externas.",
     "answer": true,
-    "explanation": "É um padrão aberto para integrar sistemas como bancos de dados, Jira ou Slack.",
-    "docUrl": "https://code.claude.com/docs/en/mcp",
+    "explanation": "É um padrão aberto para integrar ferramentas de IA a sistemas como Google Drive, Jira, Slack ou ferramentas próprias da empresa.",
+    "docUrl": "https://code.claude.com/docs/pt/mcp",
     "topic": "mcp",
     "active": true
   },
@@ -84,8 +614,8 @@
     "level": "advanced",
     "statement": "Hooks são comandos configurados pelo usuário que rodam automaticamente em eventos, como antes ou depois de o Claude usar uma ferramenta.",
     "answer": true,
-    "explanation": "Permitem automatizar regras, como formatar código após cada edição.",
-    "docUrl": "https://code.claude.com/docs/en/hooks",
+    "explanation": "Eles permitem automatizar regras, como formatar o código após cada edição ou rodar uma verificação antes de um commit.",
+    "docUrl": "https://code.claude.com/docs/pt/hooks-guide",
     "topic": "hooks",
     "active": true
   },
@@ -94,8 +624,8 @@
     "level": "advanced",
     "statement": "Subagents obrigatoriamente compartilham todo o contexto da conversa principal.",
     "answer": false,
-    "explanation": "Subagents trabalham com contexto próprio e devolvem um resultado resumido, poupando o contexto principal.",
-    "docUrl": "https://code.claude.com/docs/en/sub-agents",
+    "explanation": "Um subagent tem sua própria janela de contexto e devolve só um resumo, poupando o contexto principal. A exceção é o \"fork\", que começa com uma cópia da conversa.",
+    "docUrl": "https://code.claude.com/docs/pt/sub-agents",
     "topic": "subagents",
     "active": true
   },
@@ -104,8 +634,8 @@
     "level": "advanced",
     "statement": "Skills são pacotes de instruções que o Claude carrega quando são relevantes para uma tarefa.",
     "answer": true,
-    "explanation": "Servem para padronizar fluxos repetíveis, como um checklist de revisão do time.",
-    "docUrl": "https://code.claude.com/docs/en/skills",
+    "explanation": "Uma skill é um arquivo SKILL.md com instruções. O Claude a usa quando for útil, ou você a chama com /nome-da-skill. Serve para padronizar fluxos repetíveis do time.",
+    "docUrl": "https://code.claude.com/docs/pt/skills",
     "topic": "skills",
     "active": true
   },
@@ -114,9 +644,259 @@
     "level": "advanced",
     "statement": "O Claude Code pode ser executado de forma não interativa, por exemplo em pipelines de CI, usando a flag -p.",
     "answer": true,
-    "explanation": "O modo \"print\" executa um prompt e retorna o resultado, sem interface interativa.",
-    "docUrl": "https://code.claude.com/docs/en/headless",
+    "explanation": "Com -p (ou --print), ele executa o pedido e devolve o resultado sem interface interativa. Isso permite usá-lo em scripts e esteiras de integração contínua.",
+    "docUrl": "https://code.claude.com/docs/pt/headless",
     "topic": "automacao",
+    "active": true
+  },
+  {
+    "id": "adv-006",
+    "level": "advanced",
+    "statement": "Servidores MCP de escopo de projeto ficam no arquivo .mcp.json e podem ser compartilhados com o time pelo git.",
+    "answer": true,
+    "explanation": "Por segurança, o Claude Code pede aprovação nas sessões interativas antes de usar os servidores definidos no .mcp.json de um projeto.",
+    "docUrl": "https://code.claude.com/docs/pt/mcp",
+    "topic": "mcp",
+    "active": true
+  },
+  {
+    "id": "adv-007",
+    "level": "advanced",
+    "statement": "Um hook PreToolUse, que roda antes de uma ferramenta ser usada, pode bloquear a ação do Claude.",
+    "answer": true,
+    "explanation": "Se o script do hook terminar com o código de saída 2, a ação é bloqueada e o motivo pode ser devolvido ao Claude para ele se ajustar.",
+    "docUrl": "https://code.claude.com/docs/pt/hooks-guide",
+    "topic": "hooks",
+    "active": true
+  },
+  {
+    "id": "adv-008",
+    "level": "advanced",
+    "statement": "Subagents personalizados são arquivos Markdown guardados em .claude/agents/ no projeto ou em ~/.claude/agents/.",
+    "answer": true,
+    "explanation": "Cada arquivo tem um cabeçalho com nome e descrição, seguido das instruções. Os do projeto podem ir para o git e ser compartilhados com o time.",
+    "docUrl": "https://code.claude.com/docs/pt/sub-agents",
+    "topic": "subagents",
+    "active": true
+  },
+  {
+    "id": "adv-009",
+    "level": "advanced",
+    "statement": "É possível restringir as ferramentas de um subagent, por exemplo permitindo apenas a leitura de arquivos.",
+    "answer": true,
+    "explanation": "O campo \"tools\" funciona como uma lista do que é permitido, e \"disallowedTools\" como uma lista do que é proibido. Assim, um revisor pode ler o código sem poder editá-lo.",
+    "docUrl": "https://code.claude.com/docs/pt/sub-agents",
+    "topic": "subagents",
+    "active": true
+  },
+  {
+    "id": "adv-010",
+    "level": "advanced",
+    "statement": "Um plugin pode reunir em um só pacote skills, subagents, hooks e servidores MCP.",
+    "answer": true,
+    "explanation": "Plugins são instalados como uma unidade, em geral a partir de um marketplace (catálogo), e facilitam distribuir a mesma configuração para o time.",
+    "docUrl": "https://code.claude.com/docs/pt/plugins/overview",
+    "topic": "plugins",
+    "active": true
+  },
+  {
+    "id": "adv-011",
+    "level": "advanced",
+    "statement": "Com o GitHub Actions configurado, mencionar @claude em um pull request ou issue faz o Claude trabalhar no pedido.",
+    "answer": true,
+    "explanation": "O Claude analisa o código, implementa mudanças e envia commits. A instalação rápida é feita pelo comando /install-github-app.",
+    "docUrl": "https://code.claude.com/docs/pt/github-actions",
+    "topic": "automacao",
+    "active": true
+  },
+  {
+    "id": "adv-012",
+    "level": "advanced",
+    "statement": "As configurações gerenciadas (managed settings) que a empresa distribui têm precedência sobre as configurações pessoais e as do projeto.",
+    "answer": true,
+    "explanation": "Elas ficam no topo da ordem de prioridade e servem para impor políticas de segurança e conformidade. Só algumas chaves aceitam um valor ainda mais restritivo vindo de outro nível.",
+    "docUrl": "https://code.claude.com/docs/pt/settings",
+    "topic": "governanca",
+    "active": true
+  },
+  {
+    "id": "adv-013",
+    "level": "advanced",
+    "statement": "Nas regras de permissão, uma regra deny (negar) prevalece sobre uma regra allow (permitir) para o mesmo comando.",
+    "answer": true,
+    "explanation": "As regras são avaliadas na ordem deny, depois ask (perguntar), depois allow. Uma regra allow não consegue abrir exceção dentro de uma regra deny.",
+    "docUrl": "https://code.claude.com/docs/pt/permissions",
+    "topic": "permissoes",
+    "active": true
+  },
+  {
+    "id": "adv-014",
+    "level": "advanced",
+    "statement": "O Claude Code tem uma memória automática, em que ele mesmo anota aprendizados de uma sessão para outra.",
+    "answer": true,
+    "explanation": "Ele registra suas correções e preferências sem você escrever nada. A memória automática vem ligada por padrão e pode ser revista ou desligada com /memory.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "memoria",
+    "active": true
+  },
+  {
+    "id": "adv-015",
+    "level": "advanced",
+    "statement": "Por padrão, só a descrição de uma skill fica no contexto; o conteúdo completo é carregado quando ela é usada.",
+    "answer": true,
+    "explanation": "Isso permite ter muitas skills sem pesar no contexto. É diferente do CLAUDE.md, que é carregado inteiro em toda sessão.",
+    "docUrl": "https://code.claude.com/docs/pt/skills",
+    "topic": "skills",
+    "active": true
+  },
+  {
+    "id": "adv-016",
+    "level": "advanced",
+    "statement": "No modo não interativo (-p), a opção --output-format json devolve a resposta em JSON para ser lida por outros programas.",
+    "answer": true,
+    "explanation": "O JSON traz o resultado, o ID da sessão e metadados. Há ainda o formato stream-json, que entrega a resposta em tempo real.",
+    "docUrl": "https://code.claude.com/docs/pt/headless",
+    "topic": "automacao",
+    "active": true
+  },
+  {
+    "id": "adv-017",
+    "level": "advanced",
+    "statement": "Os hooks dependem do modelo: o Claude decide se vai executá-los ou não.",
+    "answer": false,
+    "explanation": "Hooks dão controle determinístico: rodam sempre no evento configurado, sem depender da escolha da IA. Para decisões que exigem julgamento, existem hooks baseados em prompt.",
+    "docUrl": "https://code.claude.com/docs/pt/hooks-guide",
+    "topic": "hooks",
+    "active": true
+  },
+  {
+    "id": "adv-018",
+    "level": "advanced",
+    "statement": "Subagents sempre rodam um de cada vez, em fila.",
+    "answer": false,
+    "explanation": "Vários subagents podem trabalhar ao mesmo tempo em investigações independentes, e o Claude junta os resultados depois. Por padrão, até 20 podem rodar simultaneamente.",
+    "docUrl": "https://code.claude.com/docs/pt/sub-agents",
+    "topic": "subagents",
+    "active": true
+  },
+  {
+    "id": "adv-019",
+    "level": "advanced",
+    "statement": "Skills e comandos personalizados (/comando) são recursos totalmente separados e incompatíveis.",
+    "answer": false,
+    "explanation": "Os comandos personalizados foram unificados com as skills: um arquivo em .claude/commands/ e uma skill em .claude/skills/ criam o mesmo tipo de /comando.",
+    "docUrl": "https://code.claude.com/docs/pt/skills",
+    "topic": "skills",
+    "active": true
+  },
+  {
+    "id": "adv-020",
+    "level": "advanced",
+    "statement": "O modo bypassPermissions é o recomendado para o uso diário em qualquer computador.",
+    "answer": false,
+    "explanation": "Esse modo pula as confirmações de permissão. A documentação recomenda usá-lo apenas em ambientes isolados, como contêineres ou máquinas virtuais.",
+    "docUrl": "https://code.claude.com/docs/pt/permissions",
+    "topic": "permissoes",
+    "active": true
+  },
+  {
+    "id": "adv-021",
+    "level": "advanced",
+    "statement": "O transporte SSE é o recomendado para conectar servidores MCP remotos.",
+    "answer": false,
+    "explanation": "O SSE está obsoleto. Para servidores remotos, a recomendação é o transporte HTTP. Servidores locais rodam como processos no computador (stdio).",
+    "docUrl": "https://code.claude.com/docs/pt/mcp",
+    "topic": "mcp",
+    "active": true
+  },
+  {
+    "id": "adv-022",
+    "level": "advanced",
+    "statement": "A Anthropic faz auditoria de segurança de todos os servidores MCP que podem ser conectados.",
+    "answer": false,
+    "explanation": "A Anthropic revisa os conectores do seu diretório segundo critérios de listagem, mas não audita a segurança de nenhum servidor MCP. Use servidores de fornecedores confiáveis.",
+    "docUrl": "https://code.claude.com/docs/pt/security",
+    "topic": "mcp",
+    "active": true
+  },
+  {
+    "id": "adv-023",
+    "level": "advanced",
+    "statement": "Um plugin instalado roda com menos permissões do que o seu usuário.",
+    "answer": false,
+    "explanation": "O que o plugin executa roda com as mesmas permissões do seu usuário. Por isso, vale revisar um plugin antes de instalar, qualquer que seja a origem.",
+    "docUrl": "https://code.claude.com/docs/pt/plugins/overview",
+    "topic": "plugins",
+    "active": true
+  },
+  {
+    "id": "adv-024",
+    "level": "advanced",
+    "statement": "Um subagent sempre usa o mesmo modelo da conversa principal.",
+    "answer": false,
+    "explanation": "O campo \"model\" permite escolher outro modelo para o subagent, como um mais rápido e barato para tarefas simples, ou herdar o da conversa principal.",
+    "docUrl": "https://code.claude.com/docs/pt/sub-agents",
+    "topic": "subagents",
+    "active": true
+  },
+  {
+    "id": "adv-025",
+    "level": "advanced",
+    "statement": "Subagents só podem ser criados pela conversa principal.",
+    "answer": false,
+    "explanation": "Por padrão, um subagent pode criar seus próprios subagents, até três níveis abaixo da conversa principal. Esse limite pode ser ajustado.",
+    "docUrl": "https://code.claude.com/docs/pt/sub-agents",
+    "topic": "subagents",
+    "active": true
+  },
+  {
+    "id": "adv-026",
+    "level": "advanced",
+    "statement": "No GitHub Actions, a chave de API do Claude precisa ficar escrita no arquivo do workflow.",
+    "answer": false,
+    "explanation": "A chave deve ficar guardada como um secret (segredo) do GitHub e ser apenas referenciada no workflow. Nunca escreva chaves direto no repositório.",
+    "docUrl": "https://code.claude.com/docs/pt/github-actions",
+    "topic": "automacao",
+    "active": true
+  },
+  {
+    "id": "adv-027",
+    "level": "advanced",
+    "statement": "O arquivo .claude/settings.local.json é feito para ser compartilhado com o time pelo git.",
+    "answer": false,
+    "explanation": "Ele guarda ajustes pessoais para um projeto e fica fora do git. O arquivo para compartilhar com o time é o .claude/settings.json.",
+    "docUrl": "https://code.claude.com/docs/pt/settings",
+    "topic": "governanca",
+    "active": true
+  },
+  {
+    "id": "adv-028",
+    "level": "advanced",
+    "statement": "A flag --bare faz o modo -p carregar mais configurações da máquina, como hooks e CLAUDE.md.",
+    "answer": false,
+    "explanation": "É o contrário: --bare pula a descoberta de hooks, skills, plugins, servidores MCP, memória automática e CLAUDE.md, o que torna o resultado igual em qualquer máquina.",
+    "docUrl": "https://code.claude.com/docs/pt/headless",
+    "topic": "automacao",
+    "active": true
+  },
+  {
+    "id": "adv-029",
+    "level": "advanced",
+    "statement": "A memória automática do Claude Code é sincronizada entre todos os seus computadores.",
+    "answer": false,
+    "explanation": "A memória automática é local da máquina. Ela é compartilhada entre as pastas do mesmo repositório, mas não entre computadores nem com a nuvem.",
+    "docUrl": "https://code.claude.com/docs/pt/memory",
+    "topic": "memoria",
+    "active": true
+  },
+  {
+    "id": "adv-030",
+    "level": "advanced",
+    "statement": "O sandbox do Claude Code existe para deixar os comandos mais rápidos.",
+    "answer": false,
+    "explanation": "O sandbox isola os comandos de terminal com restrições de arquivos e de rede. É uma camada de segurança que permite trabalhar com menos confirmações sem abrir mão da proteção.",
+    "docUrl": "https://code.claude.com/docs/pt/security",
+    "topic": "seguranca",
     "active": true
   }
 ]

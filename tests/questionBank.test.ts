@@ -8,11 +8,11 @@ import {
 } from '../src/schemas/question';
 
 /**
- * The bank currently holds only the 12 sample questions from PRD §3.3. The size and balance rules
- * (PRD §3.2) are skipped until step 8 completes the bank. Flip this to `true` then. The guard test
- * below fails if the bank reaches 90 questions while this is still `false`, so it can't be forgotten.
+ * Gates the size and balance rules (PRD §3.2). It was `false` while the bank held only the 12 sample
+ * questions and was turned on in step 8, when the bank reached 90. The guard test below fails if the
+ * bank has 90 questions while this is `false`, so the rules can't be silently skipped.
  */
-const BANK_COMPLETE = false;
+const BANK_COMPLETE = true;
 
 const MIN_PER_LEVEL = 30;
 const MIN_TOTAL = 90;
