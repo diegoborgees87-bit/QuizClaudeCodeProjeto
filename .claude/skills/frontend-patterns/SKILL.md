@@ -1,657 +1,230 @@
 ---
 name: frontend-patterns
-description: Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices. Use when building or reviewing React or Next.js components, state, or render performance.
+description: React 18 + Vite + Tailwind patterns for the Quizz Claude Code app (useReducer game state machine, custom hooks such as useTimer and useQuestions, screen and component composition, keyboard shortcuts, focus, aria-live, reduced motion). Use when building or reviewing anything in src/components, src/screens, src/hooks or App.tsx.
 metadata:
-  origin: ECC
+  origin: ECC (affaan-m/everything-claude-code), adapted to this project
 ---
 
-# Frontend Development Patterns
+# Frontend patterns for Quizz Claude Code
 
-Modern frontend patterns for React, Next.js, and performant user interfaces.
+Adapted from the generic ECC `frontend-patterns` skill. Everything here is subordinate to `prd.md`
+and `CLAUDE.md`. When they disagree with this file, they win.
 
-## When to Activate
+## What does NOT apply here
 
-- Building React components (composition, props, rendering)
-- Managing state (useState, useReducer, Zustand, Context)
-- Implementing data fetching (SWR, React Query, server components)
-- Optimizing performance (memoization, virtualization, code splitting)
-- Working with forms (validation, controlled inputs, Zod schemas)
-- Handling client-side routing and navigation
-- Building accessible, responsive UI patterns
+The upstream skill covers patterns this project rules out on purpose. Do not introduce them:
 
-## Component Patterns
+| Upstream pattern                         | Why not here                                                                   |
+| ---------------------------------------- | ------------------------------------------------------------------------------ |
+| Next.js, server components, routing      | Vite SPA. The screen is derived from the reducer state, no router (PRD §5.1).  |
+| Zustand, Redux, Context-per-feature      | One `useReducer` in `src/game/reducer.ts`, no external state library.          |
+| SWR, React Query, generic `useQuery`     | One fetch per game via `questionsRepo.getByLevel`, which never throws.         |
+| Framer Motion, animation libraries       | Tailwind `motion-safe:` transitions only. Keep the bundle small (load < 2s).   |
+| Virtualized lists, `React.lazy` splitting | The longest list is 10 review items. Not worth the complexity.                 |
+| Compound components, render props        | The tree is shallow. Plain props and `children` are enough.                     |
+| `useDebounce`, controlled forms          | There are no text inputs in the MVP.                                            |
 
-### Composition Over Inheritance
+## Layering
 
-```typescript
-// PASS: GOOD: Component composition
-interface CardProps {
-  children: React.ReactNode
-  variant?: 'default' | 'outlined'
-}
+Keep logic out of components so it can be unit-tested and covered at 80%:
 
-export function Card({ children, variant = 'default' }: CardProps) {
-  return <div className={`card card-${variant}`}>{children}</div>
-}
-
-export function CardHeader({ children }: { children: React.ReactNode }) {
-  return <div className="card-header">{children}</div>
-}
-
-export function CardBody({ children }: { children: React.ReactNode }) {
-  return <div className="card-body">{children}</div>
-}
-
-// Usage
-<Card>
-  <CardHeader>Title</CardHeader>
-  <CardBody>Content</CardBody>
-</Card>
+```
+src/game/      pure functions (reducer, draw, scoring). No React, no I/O, no Date.now().
+src/services/  I/O (Supabase, JSON fallback, analytics). No React.
+src/hooks/     glue between React and the two layers above (useTimer, useQuestions, useBestScores).
+src/screens/   one component per screen (HomeScreen, QuizScreen, ResultScreen). They get state + callbacks.
+src/components/ presentational pieces (LevelCard, QuestionCard, Timer, FeedbackPanel, ProgressBar, ResultSummary).
 ```
 
-### Compound Components
+A component never calls Supabase or `localStorage` directly. It calls a hook, and the hook calls a
+service.
 
-```typescript
-interface TabsContextValue {
-  activeTab: string
-  setActiveTab: (tab: string) => void
-}
+## State: one reducer, screens derived from it
 
-const TabsContext = createContext<TabsContextValue | undefined>(undefined)
+`App.tsx` owns the only `useReducer` and picks the screen from `state.phase`. Pass state and
+callbacks down as props: the tree is two levels deep, so a Context adds indirection without
+benefit.
 
-export function Tabs({ children, defaultTab }: {
-  children: React.ReactNode
-  defaultTab: string
-}) {
-  const [activeTab, setActiveTab] = useState(defaultTab)
+```tsx
+export default function App() {
+  const [state, dispatch] = useReducer(gameReducer, initialState);
 
-  return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      {children}
-    </TabsContext.Provider>
-  )
-}
-
-export function TabList({ children }: { children: React.ReactNode }) {
-  return <div className="tab-list">{children}</div>
-}
-
-export function Tab({ id, children }: { id: string, children: React.ReactNode }) {
-  const context = useContext(TabsContext)
-  if (!context) throw new Error('Tab must be used within Tabs')
-
-  return (
-    <button
-      className={context.activeTab === id ? 'active' : ''}
-      onClick={() => context.setActiveTab(id)}
-    >
-      {children}
-    </button>
-  )
-}
-
-// Usage
-<Tabs defaultTab="overview">
-  <TabList>
-    <Tab id="overview">Overview</Tab>
-    <Tab id="details">Details</Tab>
-  </TabList>
-</Tabs>
-```
-
-### Render Props Pattern
-
-```typescript
-interface DataLoaderProps<T> {
-  url: string
-  children: (data: T | null, loading: boolean, error: Error | null) => React.ReactNode
-}
-
-export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
-  const [data, setData] = useState<T | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    fetch(url)
-      .then(res => res.json())
-      .then(setData)
-      .catch(setError)
-      .finally(() => setLoading(false))
-  }, [url])
-
-  return <>{children(data, loading, error)}</>
-}
-
-// Usage
-<DataLoader<Market[]> url="/api/markets">
-  {(markets, loading, error) => {
-    if (loading) return <Spinner />
-    if (error) return <Error error={error} />
-    return <MarketList markets={markets!} />
-  }}
-</DataLoader>
-```
-
-## Custom Hooks Patterns
-
-### State Management Hook
-
-```typescript
-export function useToggle(initialValue = false): [boolean, () => void] {
-  const [value, setValue] = useState(initialValue)
-
-  const toggle = useCallback(() => {
-    setValue(v => !v)
-  }, [])
-
-  return [value, toggle]
-}
-
-// Usage
-const [isOpen, toggleOpen] = useToggle()
-```
-
-### Async Data Fetching Hook
-
-```typescript
-interface UseQueryOptions<T> {
-  onSuccess?: (data: T) => void
-  onError?: (error: Error) => void
-  enabled?: boolean
-}
-
-export function useQuery<T>(
-  key: string,
-  fetcher: () => Promise<T>,
-  options?: UseQueryOptions<T>
-) {
-  const [data, setData] = useState<T | null>(null)
-  const [error, setError] = useState<Error | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  // Keep the latest fetcher/options in refs so refetch stays referentially
-  // stable even when callers pass inline functions and object literals.
-  // Without this, every render creates a new refetch, and the effect below
-  // re-runs after each state update - an infinite fetch loop.
-  const fetcherRef = useRef(fetcher)
-  const optionsRef = useRef(options)
-  useEffect(() => {
-    fetcherRef.current = fetcher
-    optionsRef.current = options
-  })
-
-  const refetch = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      const result = await fetcherRef.current()
-      setData(result)
-      optionsRef.current?.onSuccess?.(result)
-    } catch (err) {
-      const error = err as Error
-      setError(error)
-      optionsRef.current?.onError?.(error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const enabled = options?.enabled !== false
-
-  useEffect(() => {
-    if (enabled) {
-      refetch()
-    }
-  }, [key, enabled, refetch])
-
-  return { data, error, loading, refetch }
-}
-
-// Usage
-const { data: markets, loading, error, refetch } = useQuery(
-  'markets',
-  () => fetch('/api/markets').then(r => r.json()),
-  {
-    onSuccess: data => console.log('Fetched', data.length, 'markets'),
-    onError: err => console.error('Failed:', err)
+  switch (state.phase) {
+    case 'idle':
+      return <HomeScreen onSelectLevel={(level) => dispatch({ type: 'SELECT_LEVEL', level })} />;
+    case 'loading':
+      return <LoadingScreen />;
+    case 'question':
+    case 'feedback':
+      return <QuizScreen state={state} dispatch={dispatch} />;
+    case 'result':
+      return <ResultScreen state={state} dispatch={dispatch} />;
+    case 'error':
+      return <ErrorScreen onRetry={() => dispatch({ type: 'GO_HOME' })} />;
   }
-)
+}
 ```
 
-### Debounce Hook
+Reducer rules:
 
-```typescript
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+- Model state as a **discriminated union on `phase`**, so `currentQuestion` cannot exist in
+  `idle` and TypeScript checks the `switch` for exhaustiveness.
+- An action that is invalid for the current phase returns the **same state object**. For example,
+  `ANSWER` during `feedback` or `NEXT` during `question`. This makes double clicks, a key repeat,
+  or `Enter` firing both a button click and the global shortcut harmless.
+- No side effects in the reducer. Randomness (draw) happens before dispatch, and the drawn
+  questions travel in `QUESTIONS_LOADED`.
+
+## Custom hooks
+
+### Loading questions (effect with cancellation)
+
+```tsx
+export function useQuestions(level: Level | null, dispatch: Dispatch<GameAction>) {
+  useEffect(() => {
+    if (!level) return;
+    let cancelled = false; // GO_HOME or StrictMode remount before the fetch resolves
+
+    questionsRepo.getByLevel(level).then((bank) => {
+      if (cancelled) return;
+      const drawn = drawQuestions(bank, readLastIds(level));
+      if (drawn) dispatch({ type: 'QUESTIONS_LOADED', questions: drawn });
+      else dispatch({ type: 'LOAD_FAILED' }); // bank too small even after JSON fallback
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [level, dispatch]);
+}
+```
+
+### Timer (timestamps, not tick counting)
+
+The tick only triggers re-renders. The remaining time is always recomputed from
+`performance.now()`, so throttled or skipped ticks never cause drift. Keep `onExpire` in a ref so
+an inline callback does not restart the timer on every render.
+
+```tsx
+export function useTimer(durationMs: number, running: boolean, resetKey: unknown, onExpire: () => void) {
+  const [remainingMs, setRemainingMs] = useState(durationMs);
+  const onExpireRef = useRef(onExpire);
+  useEffect(() => {
+    onExpireRef.current = onExpire;
+  });
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
+    if (!running) return;
+    // Intentionally NOT paused when the tab is hidden: it prevents simple cheating
+    // (switch tab, look up the answer, come back). See PRD §5.7.
+    const deadline = performance.now() + durationMs;
+    setRemainingMs(durationMs);
 
-    return () => clearTimeout(handler)
-  }, [value, delay])
+    const id = setInterval(() => {
+      const left = Math.max(0, deadline - performance.now());
+      setRemainingMs(left);
+      if (left === 0) {
+        clearInterval(id);
+        onExpireRef.current();
+      }
+    }, 250);
+    return () => clearInterval(id);
+  }, [durationMs, running, resetKey]); // resetKey = question index
 
-  return debouncedValue
+  return remainingMs;
 }
+```
 
-// Usage
-const [searchQuery, setSearchQuery] = useState('')
-const debouncedQuery = useDebounce(searchQuery, 500)
+Test it with `vi.useFakeTimers()` and `vi.advanceTimersByTime()`. Check that `performance.now()`
+is faked too (add `'performance'` to `toFake` if it is not), otherwise the deadline never arrives.
 
+### localStorage
+
+Always go through a small helper with `try/catch`, because private mode can throw. Never let a
+storage failure reach the UI.
+
+```ts
+export function readJson<T>(key: string, schema: z.ZodType<T>): T | null {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return null;
+    const parsed = schema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+```
+
+## Component patterns
+
+- **Small, typed props.** Pass the data a component needs (`statement`, `remainingMs`), not the
+  whole game state. Callbacks are named `onAnswer`, `onNext`, `onSelectLevel`.
+- **Composition with `children`** for repeated layout, such as a `ScreenShell` with the max width,
+  padding and heading slot shared by all screens.
+- **Memoization only when measured.** With 10 questions and one timer, `React.memo` and
+  `useCallback` are usually noise. The exception is the `dispatch`-derived callbacks passed to a
+  component that re-renders on every timer tick, where memoizing the static siblings
+  (`QuestionCard`) is cheap and worthwhile.
+- **Error boundary at the root**, with PT-BR fallback copy ("Algo deu errado. Voltar ao início.")
+  and a button that resets the boundary and the game. Never show `error.message` to the user.
+
+## Accessibility (WCAG 2.1 AA, PRD §4.4)
+
+### Global keyboard shortcuts
+
+```tsx
 useEffect(() => {
-  if (debouncedQuery) {
-    performSearch(debouncedQuery)
-  }
-}, [debouncedQuery])
-```
-
-## State Management Patterns
-
-### Context + Reducer Pattern
-
-```typescript
-interface State {
-  markets: Market[]
-  selectedMarket: Market | null
-  loading: boolean
-}
-
-type Action =
-  | { type: 'SET_MARKETS'; payload: Market[] }
-  | { type: 'SELECT_MARKET'; payload: Market }
-  | { type: 'SET_LOADING'; payload: boolean }
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'SET_MARKETS':
-      return { ...state, markets: action.payload }
-    case 'SELECT_MARKET':
-      return { ...state, selectedMarket: action.payload }
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload }
-    default:
-      return state
-  }
-}
-
-const MarketContext = createContext<{
-  state: State
-  dispatch: Dispatch<Action>
-} | undefined>(undefined)
-
-export function MarketProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, {
-    markets: [],
-    selectedMarket: null,
-    loading: false
-  })
-
-  return (
-    <MarketContext.Provider value={{ state, dispatch }}>
-      {children}
-    </MarketContext.Provider>
-  )
-}
-
-export function useMarkets() {
-  const context = useContext(MarketContext)
-  if (!context) throw new Error('useMarkets must be used within MarketProvider')
-  return context
-}
-```
-
-## Performance Optimization
-
-### Memoization
-
-```typescript
-// PASS: useMemo for expensive computations
-// Copy before sorting - Array.prototype.sort mutates in place
-const sortedMarkets = useMemo(() => {
-  return [...markets].sort((a, b) => b.volume - a.volume)
-}, [markets])
-
-// PASS: useCallback for functions passed to children
-const handleSearch = useCallback((query: string) => {
-  setSearchQuery(query)
-}, [])
-
-// PASS: React.memo for pure components
-export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
-  return (
-    <div className="market-card">
-      <h3>{market.name}</h3>
-      <p>{market.description}</p>
-    </div>
-  )
-})
-```
-
-### Code Splitting & Lazy Loading
-
-```typescript
-import { lazy, Suspense } from 'react'
-
-// PASS: Lazy load heavy components
-const HeavyChart = lazy(() => import('./HeavyChart'))
-const ThreeJsBackground = lazy(() => import('./ThreeJsBackground'))
-
-export function Dashboard() {
-  return (
-    <div>
-      <Suspense fallback={<ChartSkeleton />}>
-        <HeavyChart data={data} />
-      </Suspense>
-
-      <Suspense fallback={null}>
-        <ThreeJsBackground />
-      </Suspense>
-    </div>
-  )
-}
-```
-
-### Virtualization for Long Lists
-
-```typescript
-import { useVirtualizer } from '@tanstack/react-virtual'
-
-export function VirtualMarketList({ markets }: { markets: Market[] }) {
-  const parentRef = useRef<HTMLDivElement>(null)
-
-  const virtualizer = useVirtualizer({
-    count: markets.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 100,  // Estimated row height
-    overscan: 5  // Extra items to render
-  })
-
-  return (
-    <div ref={parentRef} style={{ height: '600px', overflow: 'auto' }}>
-      <div
-        style={{
-          height: `${virtualizer.getTotalSize()}px`,
-          position: 'relative'
-        }}
-      >
-        {virtualizer.getVirtualItems().map(virtualRow => (
-          <div
-            key={virtualRow.index}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: `${virtualRow.size}px`,
-              transform: `translateY(${virtualRow.start}px)`
-            }}
-          >
-            <MarketCard market={markets[virtualRow.index]} />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-```
-
-## Form Handling Patterns
-
-### Controlled Form with Validation
-
-```typescript
-interface FormData {
-  name: string
-  description: string
-  endDate: string
-}
-
-interface FormErrors {
-  name?: string
-  description?: string
-  endDate?: string
-}
-
-export function CreateMarketForm() {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    description: '',
-    endDate: ''
-  })
-
-  const [errors, setErrors] = useState<FormErrors>({})
-
-  const validate = (): boolean => {
-    const newErrors: FormErrors = {}
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
-    } else if (formData.name.length > 200) {
-      newErrors.name = 'Name must be under 200 characters'
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required'
-    }
-
-    if (!formData.endDate) {
-      newErrors.endDate = 'End date is required'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validate()) return
-
-    try {
-      await createMarket(formData)
-      // Success handling
-    } catch (error) {
-      // Error handling
+  function onKeyDown(e: KeyboardEvent) {
+    if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+    const key = e.key.toLowerCase();
+    if (phase === 'question') {
+      if (key === 'v' || key === 'arrowleft') onAnswer(true);
+      else if (key === 'f' || key === 'arrowright') onAnswer(false);
+    } else if (phase === 'feedback' && key === 'enter') {
+      onNext(); // the reducer ignores a duplicate NEXT if a focused button also fired
     }
   }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        value={formData.name}
-        onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-        placeholder="Market name"
-      />
-      {errors.name && <span className="error">{errors.name}</span>}
-
-      {/* Other fields */}
-
-      <button type="submit">Create Market</button>
-    </form>
-  )
-}
+  window.addEventListener('keydown', onKeyDown);
+  return () => window.removeEventListener('keydown', onKeyDown);
+}, [phase, onAnswer, onNext]);
 ```
 
-## Error Boundary Pattern
+Show the shortcut on the buttons themselves (for example "Verdadeiro (V)").
 
-```typescript
-interface ErrorBoundaryState {
-  hasError: boolean
-  error: Error | null
-}
+### Focus management
 
-export class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  ErrorBoundaryState
-> {
-  state: ErrorBoundaryState = {
-    hasError: false,
-    error: null
-  }
+On each phase or question change, move focus to the new screen's heading (`tabIndex={-1}`,
+`ref.current?.focus()`), so screen readers announce the new content and keyboard users do not
+stay on a disabled button. In feedback, focus the **Próxima** button.
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error }
-  }
+### Live regions
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error boundary caught:', error, errorInfo)
-  }
+- Feedback: `role="status"` / `aria-live="polite"` containing "✓ Correto" or "✗ Incorreto" (or
+  "Tempo esgotado") plus the explanation. Never use color alone.
+- Timer: a visually hidden `aria-live="polite"` node whose text changes only at 30, 20, 10 s
+  (`Math.ceil(remainingMs / 10000) * 10`), not every second. The visual bar can update freely.
 
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="error-fallback">
-          <h2>Something went wrong</h2>
-          <p>{this.state.error?.message}</p>
-          <button onClick={() => this.setState({ hasError: false })}>
-            Try again
-          </button>
-        </div>
-      )
-    }
+### Touch, responsive, motion
 
-    return this.props.children
-  }
-}
+- Mobile-first: design at 360px, add `sm:` / `md:` upward. Answer buttons at least `min-h-11`
+  (44px) and full width on mobile.
+- Visible focus: `focus-visible:ring-2 focus-visible:ring-offset-2`. Never remove outlines
+  without a replacement.
+- Animations and transitions only under `motion-safe:` (for example
+  `motion-safe:transition-[width]` on the timer bar).
+- External doc links: `target="_blank" rel="noopener noreferrer"` plus visible text such as
+  "(abre em nova aba)" or an equivalent `aria-label`.
 
-// Usage
-<ErrorBoundary>
-  <App />
-</ErrorBoundary>
-```
+## Copy
 
-## Animation Patterns
+All user-facing text is Brazilian Portuguese, written for non-technical business users. Keep
+identifiers, comments and test names in English unless the surrounding file does otherwise.
 
-### Framer Motion Animations
+## Testing components (RTL)
 
-```typescript
-import { motion, AnimatePresence } from 'framer-motion'
-
-// PASS: List animations
-export function AnimatedMarketList({ markets }: { markets: Market[] }) {
-  return (
-    <AnimatePresence>
-      {markets.map(market => (
-        <motion.div
-          key={market.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <MarketCard market={market} />
-        </motion.div>
-      ))}
-    </AnimatePresence>
-  )
-}
-
-// PASS: Modal animations
-export function Modal({ isOpen, onClose, children }: ModalProps) {
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            className="modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
-          <motion.div
-            className="modal-content"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          >
-            {children}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  )
-}
-```
-
-## Accessibility Patterns
-
-### Keyboard Navigation
-
-```typescript
-export function Dropdown({ options, onSelect }: DropdownProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault()
-        setActiveIndex(i => Math.min(i + 1, options.length - 1))
-        break
-      case 'ArrowUp':
-        e.preventDefault()
-        setActiveIndex(i => Math.max(i - 1, 0))
-        break
-      case 'Enter':
-        e.preventDefault()
-        onSelect(options[activeIndex])
-        setIsOpen(false)
-        break
-      case 'Escape':
-        setIsOpen(false)
-        break
-    }
-  }
-
-  return (
-    <div
-      role="combobox"
-      aria-expanded={isOpen}
-      aria-haspopup="listbox"
-      onKeyDown={handleKeyDown}
-    >
-      {/* Dropdown implementation */}
-    </div>
-  )
-}
-```
-
-### Focus Management
-
-```typescript
-export function Modal({ isOpen, onClose, children }: ModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null)
-  const previousFocusRef = useRef<HTMLElement | null>(null)
-
-  useEffect(() => {
-    if (isOpen) {
-      // Save currently focused element
-      previousFocusRef.current = document.activeElement as HTMLElement
-
-      // Focus modal
-      modalRef.current?.focus()
-    } else {
-      // Restore focus when closing
-      previousFocusRef.current?.focus()
-    }
-  }, [isOpen])
-
-  return isOpen ? (
-    <div
-      ref={modalRef}
-      role="dialog"
-      aria-modal="true"
-      tabIndex={-1}
-      onKeyDown={e => e.key === 'Escape' && onClose()}
-    >
-      {children}
-    </div>
-  ) : null
-}
-```
-
-**Remember**: Modern frontend patterns enable maintainable, performant user interfaces. Choose patterns that fit your project complexity.
+- Query by role and accessible name (`getByRole('button', { name: /verdadeiro/i })`), which also
+  checks the a11y contract.
+- Use `userEvent` for clicks and keys (`await user.keyboard('v')`, `'{ArrowRight}'`, `'{Enter}'`).
+- Test screens with a real reducer state built from fixture questions, not with mocked hooks,
+  unless the hook does I/O.
