@@ -1,0 +1,122 @@
+[
+  {
+    "id": "beg-001",
+    "level": "beginner",
+    "statement": "O Claude Code é um assistente de IA que pode ler arquivos, editar código e executar comandos em um projeto.",
+    "answer": true,
+    "explanation": "Ele atua como um agente: entende o projeto, faz alterações e roda comandos, sempre dentro das permissões dadas.",
+    "docUrl": "https://code.claude.com/docs/en/overview",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-002",
+    "level": "beginner",
+    "statement": "O Claude Code só funciona em projetos escritos em Python.",
+    "answer": false,
+    "explanation": "Ele trabalha com praticamente qualquer linguagem e tipo de arquivo de texto.",
+    "docUrl": "https://code.claude.com/docs/en/overview",
+    "topic": "fundamentos",
+    "active": true
+  },
+  {
+    "id": "beg-003",
+    "level": "beginner",
+    "statement": "Por padrão, o Claude Code pede permissão antes de ações como editar arquivos ou executar comandos.",
+    "answer": true,
+    "explanation": "O usuário aprova as ações; é possível ajustar esse comportamento com modos de permissão.",
+    "docUrl": "https://code.claude.com/docs/en/permissions",
+    "topic": "permissoes",
+    "active": true
+  },
+  {
+    "id": "beg-004",
+    "level": "beginner",
+    "statement": "O Claude Code só pode ser usado dentro de uma IDE como o VS Code.",
+    "answer": false,
+    "explanation": "Ele roda no terminal (CLI), no app desktop, na web e também tem extensões para IDEs.",
+    "docUrl": "https://code.claude.com/docs/en/overview",
+    "topic": "plataformas",
+    "active": true
+  },
+  {
+    "id": "int-001",
+    "level": "intermediate",
+    "statement": "O arquivo CLAUDE.md serve para dar ao Claude Code instruções e contexto persistentes sobre o projeto.",
+    "answer": true,
+    "explanation": "Ele é carregado automaticamente e funciona como um \"manual do projeto\" para o Claude.",
+    "docUrl": "https://code.claude.com/docs/en/memory",
+    "topic": "contexto",
+    "active": true
+  },
+  {
+    "id": "int-002",
+    "level": "intermediate",
+    "statement": "O plan mode permite que o Claude analise o problema e proponha um plano antes de alterar arquivos.",
+    "answer": true,
+    "explanation": "É útil para revisar a estratégia antes de qualquer mudança acontecer.",
+    "docUrl": "https://code.claude.com/docs/en/common-workflows",
+    "topic": "plan-mode",
+    "active": true
+  },
+  {
+    "id": "int-003",
+    "level": "intermediate",
+    "statement": "O comando /clear apaga os arquivos do projeto.",
+    "answer": false,
+    "explanation": "Ele limpa o histórico da conversa, não os arquivos.",
+    "docUrl": "https://code.claude.com/docs/en/commands",
+    "topic": "comandos",
+    "active": true
+  },
+  {
+    "id": "adv-001",
+    "level": "advanced",
+    "statement": "O MCP (Model Context Protocol) permite conectar o Claude Code a ferramentas e fontes de dados externas.",
+    "answer": true,
+    "explanation": "É um padrão aberto para integrar sistemas como bancos de dados, Jira ou Slack.",
+    "docUrl": "https://code.claude.com/docs/en/mcp",
+    "topic": "mcp",
+    "active": true
+  },
+  {
+    "id": "adv-002",
+    "level": "advanced",
+    "statement": "Hooks são comandos configurados pelo usuário que rodam automaticamente em eventos, como antes ou depois de o Claude usar uma ferramenta.",
+    "answer": true,
+    "explanation": "Permitem automatizar regras, como formatar código após cada edição.",
+    "docUrl": "https://code.claude.com/docs/en/hooks",
+    "topic": "hooks",
+    "active": true
+  },
+  {
+    "id": "adv-003",
+    "level": "advanced",
+    "statement": "Subagents obrigatoriamente compartilham todo o contexto da conversa principal.",
+    "answer": false,
+    "explanation": "Subagents trabalham com contexto próprio e devolvem um resultado resumido, poupando o contexto principal.",
+    "docUrl": "https://code.claude.com/docs/en/sub-agents",
+    "topic": "subagents",
+    "active": true
+  },
+  {
+    "id": "adv-004",
+    "level": "advanced",
+    "statement": "Skills são pacotes de instruções que o Claude carrega quando são relevantes para uma tarefa.",
+    "answer": true,
+    "explanation": "Servem para padronizar fluxos repetíveis, como um checklist de revisão do time.",
+    "docUrl": "https://code.claude.com/docs/en/skills",
+    "topic": "skills",
+    "active": true
+  },
+  {
+    "id": "adv-005",
+    "level": "advanced",
+    "statement": "O Claude Code pode ser executado de forma não interativa, por exemplo em pipelines de CI, usando a flag -p.",
+    "answer": true,
+    "explanation": "O modo \"print\" executa um prompt e retorna o resultado, sem interface interativa.",
+    "docUrl": "https://code.claude.com/docs/en/headless",
+    "topic": "automacao",
+    "active": true
+  }
+]
