@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface SupabaseConfig {
   url: string;
@@ -12,28 +12,38 @@ export function getSupabaseConfig(): SupabaseConfig | null {
   return url && anonKey ? { url, anonKey } : null;
 }
 
-let client: SupabaseClient | null | undefined;
+/** A client, or null when Supabase is unavailable. Services accept either form. */
+export type ClientSource = () => SupabaseClient | null | Promise<SupabaseClient | null>;
+
+let client: Promise<SupabaseClient | null> | undefined;
 
 /**
  * Lazily created anon client, or null when env config is missing. Callers must treat null as
  * "Supabase unavailable" and fall back (questions) or skip (analytics). The game never depends on it.
+ *
+ * supabase-js is loaded with a dynamic import, so it stays out of the initial bundle (PRD §4.4:
+ * first load under 2s on 4G) and is never downloaded at all when the env config is missing.
  */
-export function getSupabase(): SupabaseClient | null {
-  if (client !== undefined) return client;
+export function getSupabase(): Promise<SupabaseClient | null> {
+  if (client) return client;
   const config = getSupabaseConfig();
   if (!config) {
-    client = null;
+    client = Promise.resolve(null);
     return client;
   }
-  try {
-    client = createClient(config.url, config.anonKey, {
-      // No auth in the MVP: don't persist or refresh sessions.
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  client = import('@supabase/supabase-js')
+    .then(({ createClient }) =>
+      createClient(config.url, config.anonKey, {
+        // No auth in the MVP: don't persist or refresh sessions.
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      }),
+    )
+    .catch((err: unknown) => {
+      console.warn('[supabase] falha ao criar o cliente:', err);
+      // Don't cache the failure: a chunk that failed to load offline may load later.
+      client = undefined;
+      return null;
     });
-  } catch (err) {
-    console.warn('[supabase] falha ao criar o cliente:', err);
-    client = null;
-  }
   return client;
 }
 

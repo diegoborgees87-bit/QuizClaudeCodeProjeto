@@ -58,7 +58,10 @@ export const QuestionCard = forwardRef<HTMLHeadingElement, Props>(function Quest
               {isRight && <span className="text-sm font-medium">✓ Resposta correta</span>}
               {isWrongPick && <span className="text-sm font-medium">✗ Sua resposta</span>}
               {!locked && (
-                <span className="text-xs font-normal text-slate-600" aria-hidden="true">
+                <span
+                  className="hidden text-xs font-normal text-slate-600 sm:block"
+                  aria-hidden="true"
+                >
                   tecla {key}
                 </span>
               )}

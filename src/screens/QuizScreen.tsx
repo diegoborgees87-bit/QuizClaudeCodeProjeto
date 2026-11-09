@@ -82,7 +82,11 @@ export function QuizScreen({ state, onAnswer, onTimeout, onNext, onQuit }: Props
             className="w-full sm:w-auto"
           >
             {isLast ? 'Ver resultado' : 'Próxima'}
-            <span className="ml-2 text-xs font-normal opacity-80" aria-hidden="true">
+            {/* Keyboard hints only from sm up: phones have no physical keyboard. */}
+            <span
+              className="ml-2 hidden text-xs font-normal opacity-80 sm:inline"
+              aria-hidden="true"
+            >
               Enter
             </span>
           </Button>

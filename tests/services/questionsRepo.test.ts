@@ -111,6 +111,24 @@ describe('questionsRepo.getByLevel', () => {
     expect((await pending).map((q) => q.id)).toEqual(['beg-901']);
   });
 
+  it('o timeout também cobre o carregamento do cliente (import lento do supabase-js)', async () => {
+    vi.useFakeTimers();
+    const repo = createQuestionsRepo({
+      getClient: () => new Promise<SupabaseClient | null>(() => {}),
+      fallback,
+      timeoutMs: 3000,
+    });
+    const pending = repo.getByLevel('beginner');
+    await vi.advanceTimersByTimeAsync(3000);
+    expect((await pending).map((q) => q.id)).toEqual(['beg-901']);
+  });
+
+  it('aceita um cliente assíncrono', async () => {
+    const { client } = fakeClient(async () => ({ data: rows(10), error: null }));
+    const repo = createQuestionsRepo({ getClient: async () => client, fallback, timeoutMs: 3000 });
+    expect(await repo.getByLevel('beginner')).toHaveLength(10);
+  });
+
   it('usa o JSON local quando o Supabase tem menos de 10 perguntas válidas', async () => {
     const data = [...rows(9), { ...row(10), statement: 'x'.repeat(201) }];
     const { client } = fakeClient(async () => ({ data, error: null }));

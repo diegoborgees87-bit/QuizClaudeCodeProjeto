@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Level } from '../schemas/question';
 import { safeLocalStorage } from './localStore';
-import { getSupabase, getSupabaseConfig, type SupabaseConfig } from './supabase';
+import { getSupabase, getSupabaseConfig, type ClientSource, type SupabaseConfig } from './supabase';
 
 export const CLIENT_ID_KEY = 'ccquiz:clientId';
 
@@ -17,7 +17,7 @@ export interface AnswerEvent {
 }
 
 export interface AnalyticsDeps {
-  getClient: () => SupabaseClient | null;
+  getClient: ClientSource;
   getConfig: () => SupabaseConfig | null;
   storage: () => Storage | null;
   randomUUID: () => string;
@@ -39,17 +39,12 @@ export function createAnalytics(deps: AnalyticsDeps) {
   let memoryClientId: string | null = null;
 
   function enqueue(sessionId: string, op: (client: SupabaseClient) => PromiseLike<unknown>): void {
-    let client: SupabaseClient | null;
-    try {
-      client = deps.getClient();
-    } catch {
-      client = null;
-    }
-    if (!client) return;
-    const c = client;
+    // Resolving the client inside the chain keeps the order of writes and swallows a failing or
+    // missing client (supabase-js is loaded lazily, see getSupabase).
     const prev = queues.get(sessionId) ?? Promise.resolve();
     const next = prev
-      .then(() => op(c))
+      .then(() => deps.getClient())
+      .then((client) => (client ? op(client) : undefined))
       .then((result) => {
         const error = (result as { error?: unknown } | undefined)?.error;
         if (error) console.warn('[analytics] erro do Supabase (ignorado):', error);

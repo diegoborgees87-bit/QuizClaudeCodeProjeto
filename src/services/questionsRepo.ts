@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import bundledQuestions from '../../data/questions.json';
 import { parseQuestions, type Level, type Question } from '../schemas/question';
-import { getSupabase } from './supabase';
+import { getSupabase, type ClientSource } from './supabase';
 
 export const QUESTIONS_TIMEOUT_MS = 3000;
 /** Below this many valid rows a game can't be drawn, so the bundled JSON is used instead. */
@@ -36,7 +36,7 @@ export function rowToQuestion(row: QuestionRow): Record<string, unknown> {
 }
 
 export interface QuestionsRepoDeps {
-  getClient: () => SupabaseClient | null;
+  getClient: ClientSource;
   fallback: unknown;
   timeoutMs: number;
 }
@@ -46,10 +46,24 @@ export function createQuestionsRepo({ getClient, fallback, timeoutMs }: Question
     return parseQuestions(fallback).filter((q) => q.level === level && q.active);
   }
 
-  async function fromSupabase(client: SupabaseClient, level: Level): Promise<Question[]> {
+  /** Rejects when `signal` aborts first, so a slow lazy load of supabase-js counts toward the timeout. */
+  function untilAborted<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      signal.addEventListener('abort', () => reject(new Error('timeout')), { once: true });
+      promise.then(resolve, reject);
+    });
+  }
+
+  /** null when Supabase isn't configured. The timeout covers loading the client and the query. */
+  async function fromSupabase(level: Level): Promise<Question[] | null> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
+      const client: SupabaseClient | null = await untilAborted(
+        Promise.resolve(getClient()),
+        controller.signal,
+      );
+      if (!client) return null;
       const { data, error } = await client
         .from('questions')
         .select(COLUMNS)
@@ -71,10 +85,9 @@ export function createQuestionsRepo({ getClient, fallback, timeoutMs }: Question
      * config, or too few valid rows, returns the bundled `data/questions.json`. Never throws.
      */
     async getByLevel(level: Level): Promise<Question[]> {
-      const client = getClient();
-      if (!client) return fromFallback(level);
       try {
-        const questions = await fromSupabase(client, level);
+        const questions = await fromSupabase(level);
+        if (questions === null) return fromFallback(level);
         if (questions.length >= MIN_QUESTIONS_FOR_GAME) return questions;
         console.warn(
           `[questions] Supabase retornou ${questions.length} perguntas válidas para "${level}"; usando o JSON local.`,
