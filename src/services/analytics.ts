@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Level } from '../schemas/question';
+import { safeLocalStorage } from './localStore';
 import { getSupabase, getSupabaseConfig, type SupabaseConfig } from './supabase';
 
 export const CLIENT_ID_KEY = 'ccquiz:clientId';
@@ -171,14 +172,6 @@ export function createAnalytics(deps: AnalyticsDeps) {
 }
 
 export type Analytics = ReturnType<typeof createAnalytics>;
-
-function safeLocalStorage(): Storage | null {
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
-  }
-}
 
 export const analytics = createAnalytics({
   getClient: getSupabase,
